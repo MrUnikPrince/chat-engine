@@ -4,23 +4,44 @@
     <title>Chat Example</title>
   </head>
   <body>
-    <ul id="messages"></ul>
-    <input id="message" autocomplete="off" /><button>Send</button>
+    <input id="username" placeholder="Enter your name" />
+    <button id="setUsername">Set Name</button>
+    <div id="chatContainer">
+      <ul id="messages"></ul>
+      <input id="message" autocomplete="off" /><button id="sendMessage">Send</button>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
       const socket = io();
+      let username = '';
 
-      // When a message is received, display it on the page
-      socket.on('chat message', (msg) => {
-        $('#messages').append($('<li>').text(msg));
+      // Function to display a chat message with the sender's name
+      function displayMessage(sender, msg) {
+        $('#messages').append($('<li>').text(sender + ': ' + msg));
+      }
+
+      // When the Set Name button is clicked, set the username
+      $('#setUsername').click(() => {
+        username = $('#username').val();
+        alert('Name set as ' + username);
       });
 
-      // When the Send button is clicked, send the message to the server
-      $('button').click(() => {
-        socket.emit('chat message', $('#message').val());
-        $('#message').val('');
+      // When the Send button is clicked, send the message to the server with the sender's name
+      $('#sendMessage').click(() => {
+        const message = $('#message').val();
+        if (username) {
+          socket.emit('chat message', { sender: username, message });
+          $('#message').val('');
+        } else {
+          alert('Please set your name first.');
+        }
+      });
+
+      // When a message is received, display it with the sender's name
+      socket.on('chat message', (data) => {
+        displayMessage(data.sender, data.message);
       });
     </script>
   </body>
