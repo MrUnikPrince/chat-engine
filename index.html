@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat Example</title>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <input id="message" autocomplete="off" /><button>Send</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      const socket = io();
+
+      // When a message is received, display it on the page
+      socket.on('chat message', (msg) => {
+        $('#messages').append($('<li>').text(msg));
+      });
+
+      // When the Send button is clicked, send the message to the server
+      $('button').click(() => {
+        socket.emit('chat message', $('#message').val());
+        $('#message').val('');
+      });
+    </script>
+  </body>
+</html>
